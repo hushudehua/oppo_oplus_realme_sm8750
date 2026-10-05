@@ -398,6 +398,9 @@ jobs:
           echo "CONFIG_HEADERS_INSTALL=n" >> ./common/arch/arm64/configs/gki_defconfig
           # 关闭 contiguous PTE：wxshadow 需逐 PTE 翻转，contpte 的连续块假设会冲突
           echo "# CONFIG_ARM64_CONTPTE is not set" >> ./common/arch/arm64/configs/gki_defconfig
+          # 诊断（2026-10-05, MT6991 移植）：关闭两条 errata workaround（对齐参考设备 6.12），验证 KP hook_wrap 的 TLB/I-cache 假设
+          echo "# CONFIG_ARM64_ERRATUM_1286807 is not set" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "# CONFIG_ARM64_ERRATUM_1542419 is not set" >> ./common/arch/arm64/configs/gki_defconfig
           # 应用 CVE_2026_43499 修复补丁
           cd common
           wget https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/cve-2026-43499-rtmutex-6.6.patch
