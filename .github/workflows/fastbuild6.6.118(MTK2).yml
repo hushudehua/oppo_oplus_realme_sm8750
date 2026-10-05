@@ -400,6 +400,8 @@ jobs:
           sed -i 's/check_defconfig//' ./common/build.config.gki
           #跳过将uapi标准头安装到 usr/include 目录的不必要操作，节省编译时间
           echo "CONFIG_HEADERS_INSTALL=n" >> ./common/arch/arm64/configs/gki_defconfig
+          # 关闭 contiguous PTE：wxshadow 需逐 PTE 翻转，contpte 的连续块假设会冲突
+          echo "# CONFIG_ARM64_CONTPTE is not set" >> ./common/arch/arm64/configs/gki_defconfig
           # 应用 CVE_2026_43499 修复补丁
           cd common
           wget https://github.com/$GITHUB_REPOSITORY/raw/refs/heads/$GITHUB_REF_NAME/other_patch/cve-2026-43499-rtmutex-6.6.patch
@@ -645,6 +647,9 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache/CodeQL &
           make -j$(nproc --all) LLVM=1 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC="ccache clang" LD="ld.lld" HOSTLD=ld.lld O=out KCFLAGS+=-O2 KCFLAGS+=-Wno-error gki_defconfig &&
           make -j$(nproc --all) LLVM=1 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- CC="$(pwd)/cc-wrapper" LD="$(pwd)/ld-wrapper" HOSTLD=ld.lld O=out KCFLAGS+=-O2 KCFLAGS+=-Wno-error Image
+
+          # 校验 CONTPTE 已关闭（wxshadow 前置；未关则产物不可用）
+          grep -q '^# CONFIG_ARM64_CONTPTE is not set' out/.config || { echo '>>> FATAL: CONTPTE NOT disabled'; grep -n CONTPTE out/.config || true; exit 1; }
           
           # 编译后时间劫持二次校验
           echo "--- 编译后环境时间: $(LD_PRELOAD=$PRELOAD_LIBS date) ---"
