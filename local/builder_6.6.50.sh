@@ -385,7 +385,7 @@ if [[ "$USE_PATCH_LINUX" == [yY] ]]; then
   echo ">>> 使用 kptools-linux 工具处理输出..."
   cd "$OUT_DIR"
   wget https://github.com/KernelSU-Next/KPatch-Next/releases/latest/download/kptools-linux
-  wget https://github.com/KernelSU-Next/KPatch-Next/releases/latest/download/kpimg-linux
+  wget https://github.com/hushudehua/KPatch-Next/releases/latest/download/kpimg-linux
   chmod +x ./kptools-linux
   ./kptools-linux -p -i ./Image -k ./kpimg-linux -o ./oImage
   rm -f Image
